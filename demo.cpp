@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+//#include "spdlog/sinks/stdout_color_sinks.h"
 
 #include "util_infer.h"
 #include "corex_infer.h"
