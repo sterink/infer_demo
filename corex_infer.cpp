@@ -132,10 +132,10 @@ inference::inference(const char* conf) {
         for (int i = 0; i < eles.size(); i++) {
                 auto name = eles[i]["name"].asString();
                 auto num = eles[i]["tasks_num"].asInt();
-                spdlog::get("corex_infer")->info("model name {}", name);
-                spdlog::get("corex_infer")->info("model path {}", eles[i]["path"].asString());
-                spdlog::get("corex_infer")->info("tasks num {}", num);
-                spdlog::get("corex_infer")->info("batch size {}", eles[i]["batch_size"].asInt());
+                spdlog::get("corex_infer")->info("	model name {}", name);
+                spdlog::get("corex_infer")->info("	model path {}", eles[i]["path"].asString());
+                spdlog::get("corex_infer")->info("	tasks num {}", num);
+                spdlog::get("corex_infer")->info("	batch size {}", eles[i]["batch_size"].asInt());
 
                 // TODO: use factory design pattern later
                 if (name == "dummy") {
