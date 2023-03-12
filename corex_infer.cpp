@@ -15,7 +15,6 @@ using namespace std;
 #include <thread>
 
 namespace corex {
-auto console1 = spdlog::stdout_color_mt("corex_infer");
 auto console2 = spdlog::stdout_color_mt("dummy_worker");
 
 channel::channel(const char *name_) {
@@ -117,6 +116,7 @@ public:
 };
 
 inference::inference(const char* conf) {
+       	auto console1 = spdlog::stdout_color_mt("corex_infer");
         spdlog::get("corex_infer")->info("inference ctor!");
 
         ifstream ifs(conf);
