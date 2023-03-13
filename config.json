@@ -2,12 +2,14 @@
   "models": [
     {
       "name":"dummy", // dummy model for test only
+      "ordial":1,
       "path":"xxx",
       "tasks_num":1,
       "batch_size":5
     },
     {
       "name":"tdnn",
+      "ordial":2,
       "path":"yyy",
       "tasks_num":2,
       "batch_size":4

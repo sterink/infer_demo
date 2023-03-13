@@ -2,9 +2,6 @@
 #include "corex_infer.h"
 #include "json/json.h"
 
-#include "spdlog/spdlog.h"
-//#include "spdlog/sinks/stdout_color_sinks.h"
-
 namespace corex {
 class dummy_engine: public engine {
 public:
@@ -14,6 +11,10 @@ public:
 public:
         channel &get_in();
         channel &get_out();
+
+public:
+        bool call(const float *, int32_t, int32_t);
+
 private:
         static void *run(void *);
 };
