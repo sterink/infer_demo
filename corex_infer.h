@@ -5,6 +5,7 @@
 #include <list>
 #include <map>
 
+#include <thread>
 #include "TSQueue.hpp"
 
 using namespace std;
@@ -37,6 +38,10 @@ private:
 };
 
 class engine {
+protected:
+        bool running;
+        std::vector<thread> agents;
+        channel *in_ch, *out_ch;
 public:
 
 public:
