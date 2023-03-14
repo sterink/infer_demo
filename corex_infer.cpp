@@ -13,6 +13,7 @@ using json = nlohmann::json;
 //#include "spdlog/sinks/stdout_color_sinks.h"
 
 #include "dummy_engine.h"
+#include "tdnn_engine.h"
 
 #include <chrono>
 #include <thread>
@@ -77,7 +78,16 @@ inference::inference(const char* conf) {
 
                         cin_map[name] = in;
                 }
-        }
+		else if (name == "tdnn") {
+                        spdlog::get("corex_infer")->info("register tdnn engine");
+                        channel *in = new channel("tdnn");
+
+                        tdnn_engine *eng = new tdnn_engine(in, out, ele);
+                        e_map[name] = eng;
+
+                        cin_map[name] = in;
+                }
+         }
         spdlog::get("corex_infer")->info("done with inference building!");
 }
 
