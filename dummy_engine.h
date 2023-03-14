@@ -1,11 +1,13 @@
 #pragma once
 #include "corex_infer.h"
-#include "json/json.h"
+
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
 
 namespace corex {
 class dummy_engine: public engine {
 public:
-        dummy_engine(channel *in, channel *out, const Json::Value);
+        dummy_engine(channel *in, channel *out, const json&);
         ~dummy_engine();
 
 public:

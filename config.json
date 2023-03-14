@@ -1,7 +1,7 @@
 {
   "models": [
     {
-      "name":"dummy", // dummy model for test only
+      "name":"dummy",
       "ordial":1,
       "path":"xxx",
       "tasks_num":1,
@@ -11,8 +11,12 @@
       "name":"tdnn",
       "ordial":2,
       "path":"yyy",
+      "input_name":"input",
+      "graph_file":"graph",
+      "weight_file":"weight",
+      "device_idx":0,
       "tasks_num":2,
       "batch_size":4
-    },
+    }
   ]
 }

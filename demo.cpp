@@ -6,7 +6,7 @@
 #include <thread>
 
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+//#include "spdlog/sinks/stdout_color_sinks.h"
 
 #include "util_infer.h"
 #include "corex_infer.h"
@@ -68,9 +68,11 @@ void func(int th) {
         for(int i=0;i<len;i++) input[i] = i*0.1f;
         float *output = NULL;
 
+        int lanes = 2; // the number of methods for any given wave file
         util_infer::run_dummy(input, len, th);
         
-        util_infer::run_dummy(input, len, th);
+        // another method
+	util_infer::run_dummy(input, len, th);
 
         // wait for the inference results
 
@@ -78,14 +80,13 @@ void func(int th) {
 
         std::list<corex::frame_t_*> res;
 
-        int lanes = 2; // the number of methods for any given wave file
         util_infer::get_rep(th, lanes, res);
 
         spdlog::get("console")->info("get all inference results for the same wave file");
         // scores
         for (auto it = res.begin(); it != res.end(); it++) {
                 auto ele = *it;
-                spdlog::get("console")->info("frame data src:{} type:{}, seq:{}", ele->src, ele->type, ele->seq);
+                spdlog::get("console")->info("frame data src:{} type:{}, seq:{} len:{}", ele->src, ele->type, ele->seq, ele->len);
                 spdlog::get("console")->info("val:[{},{},{},]", ele->data[0], ele->data[1], ele->data[2]);
 
                 // free memory after the last step

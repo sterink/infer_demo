@@ -6,10 +6,11 @@
 #include "corex_infer.h"
 using namespace std;
 
-#include "json/json.h"
+#include "nlohmann/json.hpp"
+using json = nlohmann::json;
 
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+//#include "spdlog/sinks/stdout_color_sinks.h"
 
 #include "dummy_engine.h"
 
@@ -52,11 +53,6 @@ inference::inference(const char* conf) {
         auto console1 = spdlog::stdout_color_mt("corex_infer");
         spdlog::get("corex_infer")->info("inference ctor!");
 
-        ifstream ifs(conf);
-        Json::Reader reader;
-        Json::Value obj;
-        reader.parse(ifs, obj); // reader can also read strings
-
         channel *out = new channel("sink");
         cout_map[0] = out;
 
@@ -64,15 +60,19 @@ inference::inference(const char* conf) {
         pthread_create(&pt, NULL, daemon, this);
 
         spdlog::get("corex_infer")->info("start to parse conf!");
-        const Json::Value& eles = obj["models"]; // array of models
-        for (int i = 0; i < eles.size(); i++) {
-                auto name = eles[i]["name"].asString();
+
+        ifstream ifs(conf);
+        auto obj = json::parse(ifs);
+
+	auto data = obj["models"];
+	for (auto& ele : data) {
+                auto name = ele["name"];
                 // TODO: use factory design pattern later
                 if (name == "dummy") {
                         spdlog::get("corex_infer")->info("register dummy engine");
                         channel *in = new channel("dummy");
 
-                        dummy_engine *eng = new dummy_engine(in, out, eles[i]);
+                        dummy_engine *eng = new dummy_engine(in, out, ele);
                         e_map[name] = eng;
 
                         cin_map[name] = in;

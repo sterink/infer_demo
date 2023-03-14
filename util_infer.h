@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 #include <list>
 namespace corex {
 class inference;

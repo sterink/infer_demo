@@ -1,18 +1,19 @@
 #include "dummy_engine.h"
 
 #include "spdlog/spdlog.h"
-#include "spdlog/sinks/stdout_color_sinks.h"
+//#include "spdlog/sinks/stdout_color_sinks.h"
 
 namespace corex {
-dummy_engine::dummy_engine(channel *in, channel *out, const Json::Value info) {
+dummy_engine::dummy_engine(channel *in, channel *out, const json &info) {
         auto console2 = spdlog::stdout_color_mt("dummy_worker");
         running = true;
         in_ch = in;
         out_ch = out;
-        ordial = info["ordial"].asInt();
-        auto num = info["tasks_num"].asInt();
-        auto path = info["path"].asString();
-        auto bs = info["batch_size"].asInt();
+        ordial = info["ordial"].get<int32_t>();
+	std::cout << ordial << std::endl;
+        auto num = info["tasks_num"].get<int32_t>();
+        auto path = info["path"].get<std::string>();
+        auto bs = info["batch_size"].get<int32_t>();
         spdlog::get("dummy_worker")->info("      model path {}", path);
         spdlog::get("dummy_worker")->info("      tasks num {}", num);
         spdlog::get("dummy_worker")->info("      batch size {}", bs);
@@ -64,8 +65,8 @@ bool dummy_engine::call(const float *input, int32_t len, int32_t th) {
 }
 
 void *dummy_engine::run(void *p) {
-
         dummy_engine *that = (dummy_engine *)p;
+       	std::list<corex::frame_t_*> pool;
         // spdlog::get("dummy_worker")->info("dummy_worker is running!");
         while (that->running) {
                 // wait for incomming items
@@ -88,12 +89,43 @@ void *dummy_engine::run(void *p) {
                 reply->seq = msg->seq;
                 reply->len = len;
 
-                // pass through
+		if(msg->seq<0){ // last frame
+			// combine all frames
+			int32_t size = reply->len;
+			for (auto it = pool.begin(); it != pool.end(); it++) {
+				if((*it)->src == reply->src){
+				       	size += (*it)->len;
+				}
+			}
+		       	// simply augment the input
+			frame_t_ *ans = (frame_t_ *)new float[sizeof(frame_t_)/sizeof(float) + size];
+			ans->len = size;
+		       	ans->type = that->ordial;
+		       	ans->src = msg->src;
+		       	ans->seq = -1;
+			float *p = ans->data;
+		       	std::list<corex::frame_t_*> bar;
+			for (auto it = pool.begin(); it != pool.end(); it++) {
+				if((*it)->src == reply->src){
+				       	memcpy(p, (*it)->data, sizeof(float)*(*it)->len);
+				       	delete [](*it);
+				}
+				else{ // keep other frames
+					bar.push_back(*it);
+				}
+			}
+			pool = bar;
+
+			delete []reply;
+		       
+			that->get_out().put(ans);
+		       	spdlog::get("dummy_worker")->info("finishes the calculation");
+		}
+	       	else{
+		       	pool.push_back(reply);
+		}
+
                 if (msg) delete []msg;
-
-                that->get_out().put(reply);
-
-                spdlog::get("dummy_worker")->info("finishes the calculation");
         }
         pthread_exit(NULL);
 }
